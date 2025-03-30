@@ -1,0 +1,29 @@
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>IRCAD Africa</h2>
+    </div>
+    <ul>
+        <li><a href="/dashboard" class="<%= path === '/dashboard' ? 'active' : '' %>">
+            <i class="fas fa-home"></i> Dashboard
+        </a></li>
+        <li><a href="/announcements" class="<%= path === '/announcements' ? 'active' : '' %>">
+            <i class="fas fa-bullhorn"></i> Announcements
+        </a></li>
+        <li><a href="/internal-links" class="<%= path === '/internal-links' ? 'active' : '' %>">
+            <i class="fas fa-link"></i> Internal Links
+        </a></li>
+        <% if (user.role === 'admin') { %>
+            <li><a href="/users" class="<%= path === '/users' ? 'active' : '' %>">
+                <i class="fas fa-users"></i> User Management
+            </a></li>
+        <% } %>
+        <% if (user.role === 'admin' || user.role === 'editor') { %>
+            <li><a href="/announcements/new" class="<%= path === '/announcements/new' ? 'active' : '' %>">
+                <i class="fas fa-plus"></i> Create Announcement
+            </a></li>
+        <% } %>
+        <li><a href="/logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a></li>
+    </ul>
+</div>

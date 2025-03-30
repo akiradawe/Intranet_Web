@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IRCAD Africa Intranet - Internal Links</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="user-info">
+                <h3>Welcome, <%= user.username %></h3>
+            </div>
+            <ul>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/announcements">Announcements</a></li>
+                <li><a href="/internal-links">Internal Links</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="content-header">
+                <h1>Internal Links</h1>
+                <a href="/internal-links/new" class="btn-new">Add New Link</a>
+            </div>
+
+            <div class="links-grid">
+                <% if (links.length === 0) { %>
+                    <p>No links available.</p>
+                <% } else { %>
+                    <% 
+                    const categories = {};
+                    links.forEach(link => {
+                        if (!categories[link.category]) {
+                            categories[link.category] = [];
+                        }
+                        categories[link.category].push(link);
+                    });
+                    %>
+                    
+                    <% for (const category in categories) { %>
+                        <div class="category-section">
+                            <h2><%= category || 'Uncategorized' %></h2>
+                            <div class="links-list">
+                                <% categories[category].forEach(link => { %>
+                                    <div class="link-card">
+                                        <h3><%= link.title %></h3>
+                                        <p><%= link.description %></p>
+                                        <a href="<%= link.url %>" target="_blank" class="btn-visit">Visit Link</a>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% } %>
+                <% } %>
+            </div>
+        </main>
+    </div>
+</body>
+</html> 

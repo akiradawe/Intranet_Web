@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Internal Link - IRCAD Africa Intranet</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .icon-preview {
+            font-size: 2rem;
+            margin: 1rem 0;
+            color: #007bff;
+            text-align: center;
+        }
+        .icon-select {
+            position: relative;
+            margin-top: 0.5rem;
+        }
+        select.icon-dropdown {
+            width: 100%;
+            padding: 0.8rem;
+            padding-right: 2.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23495057'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.8rem center;
+            background-size: 1.2rem;
+            cursor: pointer;
+        }
+        select.icon-dropdown:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .icon-option-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .icon-option-item i {
+            width: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <%- include('../partials/sidebar', { user: user, path: '/internal-links' }) %>
+        
+        <main class="content">
+            <div class="content-header">
+                <h1>Edit Internal Link</h1>
+                <a href="/internal-links" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Links
+                </a>
+            </div>
+
+            <form action="/internal-links/<%= link.id %>" method="POST" class="form-container">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" value="<%= link.title %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="url">URL:</label>
+                    <input type="url" id="url" name="url" value="<%= link.url %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" rows="3"><%= link.description %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category:</label>
+                    <input type="text" id="category" name="category" value="<%= link.category %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="icon">Icon:</label>
+                    <div class="icon-preview">
+                        <i id="selectedIcon" class="<%= link.icon ? (link.icon.startsWith('fab ') ? link.icon : 'fas ' + link.icon) : 'fas fa-link' %>"></i>
+                    </div>
+                    <div class="icon-select">
+                        <select id="icon" name="icon" class="icon-dropdown" required>
+                            <optgroup label="General">
+                                <option value="fa-link" <%= link.icon === 'fa-link' ? 'selected' : '' %>>Link</option>
+                                <option value="fa-envelope" <%= link.icon === 'fa-envelope' ? 'selected' : '' %>>Mail</option>
+                                <option value="fa-users" <%= link.icon === 'fa-users' ? 'selected' : '' %>>Users</option>
+                                <option value="fa-calendar" <%= link.icon === 'fa-calendar' ? 'selected' : '' %>>Calendar</option>
+                                <option value="fa-file" <%= link.icon === 'fa-file' ? 'selected' : '' %>>File</option>
+                                <option value="fa-chart-bar" <%= link.icon === 'fa-chart-bar' ? 'selected' : '' %>>Chart</option>
+                                <option value="fa-cog" <%= link.icon === 'fa-cog' ? 'selected' : '' %>>Settings</option>
+                                <option value="fa-book" <%= link.icon === 'fa-book' ? 'selected' : '' %>>Book</option>
+                                <option value="fa-graduation-cap" <%= link.icon === 'fa-graduation-cap' ? 'selected' : '' %>>Education</option>
+                                <option value="fa-briefcase" <%= link.icon === 'fa-briefcase' ? 'selected' : '' %>>Work</option>
+                                <option value="fa-globe" <%= link.icon === 'fa-globe' ? 'selected' : '' %>>Web</option>
+                                <option value="fa-phone" <%= link.icon === 'fa-phone' ? 'selected' : '' %>>Phone</option>
+                            </optgroup>
+                            <optgroup label="Social Media">
+                                <option value="fab fa-facebook" <%= link.icon === 'fab fa-facebook' ? 'selected' : '' %>>Facebook</option>
+                                <option value="fab fa-twitter" <%= link.icon === 'fab fa-twitter' ? 'selected' : '' %>>Twitter</option>
+                                <option value="fab fa-instagram" <%= link.icon === 'fab fa-instagram' ? 'selected' : '' %>>Instagram</option>
+                                <option value="fab fa-linkedin" <%= link.icon === 'fab fa-linkedin' ? 'selected' : '' %>>LinkedIn</option>
+                                <option value="fab fa-youtube" <%= link.icon === 'fab fa-youtube' ? 'selected' : '' %>>YouTube</option>
+                                <option value="fab fa-whatsapp" <%= link.icon === 'fab fa-whatsapp' ? 'selected' : '' %>>WhatsApp</option>
+                                <option value="fab fa-telegram" <%= link.icon === 'fab fa-telegram' ? 'selected' : '' %>>Telegram</option>
+                                <option value="fab fa-github" <%= link.icon === 'fab fa-github' ? 'selected' : '' %>>GitHub</option>
+                            </optgroup>
+                            <optgroup label="Additional">
+                                <option value="fa-home" <%= link.icon === 'fa-home' ? 'selected' : '' %>>Home</option>
+                                <option value="fa-newspaper" <%= link.icon === 'fa-newspaper' ? 'selected' : '' %>>News</option>
+                                <option value="fa-video" <%= link.icon === 'fa-video' ? 'selected' : '' %>>Video</option>
+                                <option value="fa-image" <%= link.icon === 'fa-image' ? 'selected' : '' %>>Image</option>
+                                <option value="fa-download" <%= link.icon === 'fa-download' ? 'selected' : '' %>>Download</option>
+                                <option value="fa-cloud" <%= link.icon === 'fa-cloud' ? 'selected' : '' %>>Cloud</option>
+                                <option value="fa-database" <%= link.icon === 'fa-database' ? 'selected' : '' %>>Database</option>
+                                <option value="fa-server" <%= link.icon === 'fa-server' ? 'selected' : '' %>>Server</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i> Update Link
+                </button>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        // Icon selector functionality
+        document.getElementById('icon').addEventListener('change', function() {
+            const iconValue = this.value;
+            const isSocial = iconValue.startsWith('fab');
+            const iconClass = isSocial ? iconValue : 'fas ' + iconValue;
+            document.getElementById('selectedIcon').className = iconClass;
+        });
+    </script>
+</body>
+</html> 
