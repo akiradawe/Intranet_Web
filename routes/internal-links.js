@@ -11,10 +11,19 @@ const isAdmin = (req, res, next) => {
     }
 };
 
-// Apply admin middleware to all routes
-router.use(isAdmin);
+// Middleware to check if user is authenticated
+const isAuthenticated = (req, res, next) => {
+    if (req.session.user) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+};
 
-// List all internal links
+// Apply authentication middleware to all routes
+router.use(isAuthenticated);
+
+// List all internal links - accessible to all authenticated users
 router.get('/', (req, res) => {
     db.query('SELECT * FROM internal_links ORDER BY category, title', 
         (error, links) => {
@@ -34,6 +43,13 @@ router.get('/', (req, res) => {
         }
     );
 });
+
+// Apply admin middleware only to routes that modify data
+router.use('/new', isAdmin);
+router.use('/', isAdmin);
+router.use('/:id/edit', isAdmin);
+router.use('/:id', isAdmin);
+router.use('/:id/delete', isAdmin);
 
 // Show create form
 router.get('/new', (req, res) => {

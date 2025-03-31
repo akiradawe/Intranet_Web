@@ -7,6 +7,9 @@ const userRoutes = require('./routes/users');
 const announcementRoutes = require('./routes/announcements');
 const internalLinkRoutes = require('./routes/internal-links');
 const authRoutes = require('./routes/auth');
+const mountableServicesRouter = require('./routes/mountable-services');
+const myAccountRouter = require('./routes/my-account');
+const teamRouter = require('./routes/team');
 
 const app = express();
 
@@ -24,7 +27,7 @@ app.use(session({
 }));
 
 // Add this after your other middleware
-app.use('/uploads', express.static('public/uploads'));
+app.use('/uploads', express.static('uploads'));
 
 // Database connection
 const db = mysql.createConnection({
@@ -54,6 +57,15 @@ app.use('/announcements', announcementRoutes);
 // Add internal link routes
 app.use('/internal-links', internalLinkRoutes);
 
+// Add mountable services routes
+app.use('/mountable-services', mountableServicesRouter);
+
+// Add my account routes
+app.use('/my-account', myAccountRouter);
+
+// Add team routes
+app.use('/team', teamRouter);
+
 // Dashboard route
 app.get('/dashboard', (req, res) => {
     if (!req.session.user) {
@@ -76,11 +88,23 @@ app.get('/dashboard', (req, res) => {
                         links = [];
                     }
 
-                    res.render('dashboard', { 
-                        user: req.session.user,
-                        announcements: announcements,
-                        links: links
-                    });
+                    // Get mountable services
+                    db.query('SELECT * FROM mountable_services ORDER BY name ASC',
+                        (error, services) => {
+                            if (error) {
+                                console.error(error);
+                                services = [];
+                            }
+
+                            res.render('dashboard', { 
+                                user: req.session.user,
+                                announcements: announcements,
+                                links: links,
+                                services: services,
+                                path: '/dashboard'
+                            });
+                        }
+                    );
                 }
             );
         }

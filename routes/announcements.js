@@ -164,30 +164,203 @@ router.post('/:id/comments', isAuthenticated, (req, res) => {
 });
 
 // Delete announcement
-router.post('/delete/:id', isAdminOrEditor, (req, res) => {
-    req.app.locals.db.query(
-        'DELETE FROM announcements WHERE id = ?',
-        [req.params.id],
-        (error) => {
-            if (error) {
-                console.error(error);
-            }
-            res.redirect('/announcements');
+router.post('/:id/delete', isAdminOrEditor, (req, res) => {
+    const announcementId = req.params.id;
+
+    // First, get the announcement details to delete associated files
+    req.app.locals.db.query(`
+        SELECT a.*, 
+        GROUP_CONCAT(att.filename) as attachment_files
+        FROM announcements a
+        LEFT JOIN attachments att ON a.id = att.announcement_id
+        WHERE a.id = ?
+        GROUP BY a.id
+    `, [announcementId], (error, results) => {
+        if (error) {
+            console.error('Error fetching announcement:', error);
+            return res.redirect('/announcements');
         }
-    );
+
+        if (results.length === 0) {
+            return res.redirect('/announcements');
+        }
+
+        const announcement = results[0];
+
+        // Delete the image file if it exists
+        if (announcement.image_path) {
+            const imagePath = path.join('public/uploads', announcement.image_path);
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
+        }
+
+        // Delete attachment files if they exist
+        if (announcement.attachment_files) {
+            const attachmentFiles = announcement.attachment_files.split(',');
+            attachmentFiles.forEach(filename => {
+                const filePath = path.join('public/uploads', filename);
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            });
+        }
+
+        // Delete attachments from database
+        req.app.locals.db.query('DELETE FROM attachments WHERE announcement_id = ?', [announcementId], (error) => {
+            if (error) {
+                console.error('Error deleting attachments:', error);
+            }
+
+            // Finally, delete the announcement
+            req.app.locals.db.query('DELETE FROM announcements WHERE id = ?', [announcementId], (error) => {
+                if (error) {
+                    console.error('Error deleting announcement:', error);
+                }
+                res.redirect('/announcements');
+            });
+        });
+    });
 });
 
 // Protected routes (admin and editor only)
 router.get('/:id/edit', isAdminOrEditor, (req, res) => {
-    // ... existing code ...
+    req.app.locals.db.query(`
+        SELECT a.*, u.username,
+        GROUP_CONCAT(
+            JSON_OBJECT(
+                'id', att.id,
+                'filename', att.filename,
+                'filepath', att.filepath,
+                'filetype', att.filetype
+            )
+        ) as attachments
+        FROM announcements a 
+        LEFT JOIN users u ON a.user_id = u.id 
+        LEFT JOIN attachments att ON a.id = att.announcement_id
+        WHERE a.id = ?
+        GROUP BY a.id
+    `, [req.params.id], (error, results) => {
+        if (error) {
+            console.error(error);
+            return res.redirect('/announcements');
+        }
+
+        if (results.length === 0) {
+            return res.redirect('/announcements');
+        }
+
+        const announcement = results[0];
+        if (announcement.attachments) {
+            announcement.attachments = JSON.parse(`[${announcement.attachments}]`);
+        } else {
+            announcement.attachments = [];
+        }
+
+        res.render('announcements/edit', {
+            user: req.session.user,
+            announcement: announcement,
+            path: '/announcements',
+            error: null
+        });
+    });
 });
 
-router.post('/:id/edit', isAdminOrEditor, (req, res) => {
-    // ... existing code ...
+router.post('/:id/edit', isAdminOrEditor, upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'attachments', maxCount: 5 }
+]), (req, res) => {
+    const { title, content } = req.body;
+    const announcementId = req.params.id;
+
+    if (!title || !content) {
+        return res.render('announcements/edit', {
+            user: req.session.user,
+            announcement: req.body,
+            path: '/announcements',
+            error: 'Title and content are required'
+        });
+    }
+
+    // Handle image upload
+    const imagePath = req.files['image'] ? req.files['image'][0].filename : req.body.current_image;
+
+    // Update announcement
+    req.app.locals.db.query(
+        'UPDATE announcements SET title = ?, content = ?, image_path = ? WHERE id = ?',
+        [title, content, imagePath, announcementId],
+        (error) => {
+            if (error) {
+                console.error(error);
+                return res.render('announcements/edit', {
+                    user: req.session.user,
+                    announcement: req.body,
+                    path: '/announcements',
+                    error: 'Failed to update announcement'
+                });
+            }
+
+            // Handle new attachments
+            if (req.files['attachments'] && req.files['attachments'].length > 0) {
+                const attachments = req.files['attachments'].map(file => file.filename);
+                const attachmentValues = attachments.map(filename => [announcementId, filename]);
+                
+                req.app.locals.db.query(
+                    'INSERT INTO attachments (announcement_id, filename) VALUES ?',
+                    [attachmentValues],
+                    (error) => {
+                        if (error) {
+                            console.error('Failed to save attachments:', error);
+                        }
+                        res.redirect('/announcements');
+                    }
+                );
+            } else {
+                res.redirect('/announcements');
+            }
+        }
+    );
 });
 
-router.post('/:id/delete', isAdminOrEditor, (req, res) => {
-    // ... existing code ...
+// Delete attachment
+router.post('/:announcementId/attachments/:attachmentId/delete', isAdminOrEditor, (req, res) => {
+    const { announcementId, attachmentId } = req.params;
+
+    // First, get the attachment details to delete the file
+    req.app.locals.db.query(
+        'SELECT filename FROM attachments WHERE id = ? AND announcement_id = ?',
+        [attachmentId, announcementId],
+        (error, results) => {
+            if (error) {
+                console.error('Error fetching attachment:', error);
+                return res.redirect(`/announcements/${announcementId}/edit`);
+            }
+
+            if (results.length === 0) {
+                return res.redirect(`/announcements/${announcementId}/edit`);
+            }
+
+            const attachment = results[0];
+
+            // Delete the file from filesystem
+            const filePath = path.join('public/uploads', attachment.filename);
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+
+            // Delete the attachment from database
+            req.app.locals.db.query(
+                'DELETE FROM attachments WHERE id = ? AND announcement_id = ?',
+                [attachmentId, announcementId],
+                (error) => {
+                    if (error) {
+                        console.error('Error deleting attachment:', error);
+                    }
+                    res.redirect(`/announcements/${announcementId}/edit`);
+                }
+            );
+        }
+    );
 });
 
 module.exports = router;

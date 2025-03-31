@@ -1,78 +1,221 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - IRCAD Africa Intranet</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <div class="dashboard-container">
-        <%- include('./partials/sidebar', { user: user, path: '/dashboard' }) %>
+    <div class="wrapper">
+        <%- include('partials/sidebar') %>
         
-        <main class="content">
-            <div class="content-header">
-                <h1>Welcome, <%= user.username %></h1>
-            </div>
+        <div class="content">
+            <div class="container mt-4">
+                <h1 class="mb-4">Welcome, <%= user.username %></h1>
 
-            <!-- Quick Links Section -->
-            <section class="quick-links-section">
-                <div class="section-header">
-                    <h2>Quick Links</h2>
-                    <% if (user.role === 'admin') { %>
-                        <a href="/internal-links" class="btn-view-all">Manage Links</a>
-                    <% } %>
-                </div>
-                <div class="quick-links-grid">
-                    <% 
-                    // Define an array of background colors to cycle through
-                    const colors = [
-                        '#FF6B6B', '#B07D62', '#FF8B6B', '#C19A6B', '#614051',
-                        '#6B5B95', '#8B0000', '#4B0082', '#556B2F', '#2F4F4F'
-                    ];
-                    
-                    links.forEach((link, index) => { 
-                        // Cycle through colors array
-                        const bgColor = colors[index % colors.length];
-                    %>
-                        <a href="<%= link.url %>" class="quick-link-button" style="background-color: <%= bgColor %>;" target="_blank">
-                            <i class="<%= link.icon || 'fas fa-link' %>"></i>
-                            <span><%= link.title %></span>
-                        </a>
-                    <% }) %>
-                </div>
-            </section>
-
-            <!-- Latest Announcements Section -->
-            <section class="announcements-section">
-                <div class="section-header">
-                    <h2>Latest Announcements</h2>
-                    <a href="/announcements" class="btn-view-all">View All</a>
-                </div>
-                <div class="announcements-grid">
-                    <% announcements.forEach(announcement => { %>
-                        <div class="announcement-card">
-                            <div class="announcement-image">
-                                <% if (announcement.image_path) { %>
-                                    <img src="/uploads/<%= announcement.image_path %>" alt="Announcement Image">
-                                <% } else { %>
-                                    <div class="default-image">
-                                        <i class="fas fa-bullhorn"></i>
-                                    </div>
-                                <% } %>
+                <div class="row">
+                    <!-- Main Content Column (70%) -->
+                    <div class="col-lg-8">
+                        <!-- Quick Links Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-link me-2"></i>Quick Links
+                                </h5>
+                                <a href="/internal-links" class="btn btn-light btn-sm">
+                                    View More <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
                             </div>
-                            <div class="announcement-content">
-                                <h3><%= announcement.title %></h3>
-                                <p class="announcement-text"><%= announcement.content %></p>
-                                <div class="announcement-meta">
-                                    <span><i class="fas fa-user"></i> <%= announcement.username %></span>
-                                    <span><i class="fas fa-calendar"></i> <%= new Date(announcement.created_at).toLocaleDateString() %></span>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <% const colors = ['primary', 'success', 'info', 'warning', 'danger', 'secondary']; %>
+                                    <% links.forEach((link, index) => { %>
+                                        <div class="col-md-4 col-lg-3">
+                                            <a href="<%= link.url %>" class="btn btn-<%= colors[index % colors.length] %> w-100 text-white" target="_blank">
+                                                <i class="<%= link.icon %> me-2"></i><%= link.title %>
+                                            </a>
+                                        </div>
+                                    <% }); %>
                                 </div>
                             </div>
                         </div>
-                    <% }) %>
+
+                        <!-- Mountable Services Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-network-wired me-2"></i>Mountable Services
+                                </h5>
+                                <a href="/mountable-services" class="btn btn-light btn-sm">
+                                    View More <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <% services.forEach((service, index) => { %>
+                                        <div class="col-md-4 col-lg-3">
+                                            <div class="card h-100">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">
+                                                        <i class="<%= service.icon %> me-2"></i><%= service.name %>
+                                                    </h6>
+                                                    <p class="card-text small text-muted"><%= service.description %></p>
+                                                    
+                                                    <!-- Windows Mount Button -->
+                                                    <div class="mb-2">
+                                                        <button class="btn btn-sm btn-outline-primary copy-btn w-100" 
+                                                                data-command="<%= service.windows_command %>"
+                                                                data-os="windows">
+                                                            <i class="fab fa-windows me-1"></i>Mount (Windows)
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <!-- Mac/Linux Mount Button -->
+                                                    <button class="btn btn-sm btn-outline-success copy-btn w-100" 
+                                                            data-command="<%= service.mac_linux_command %>"
+                                                            data-os="mac">
+                                                        <i class="fas fa-desktop me-1"></i>Mount (Mac/Linux)
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Announcements Section -->
+                        <div class="card">
+                            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-bullhorn me-2"></i>Recent Announcements
+                                </h5>
+                                <a href="/announcements" class="btn btn-light btn-sm">
+                                    View More <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <% if (announcements && announcements.length > 0) { %>
+                                    <div class="row">
+                                        <% announcements.forEach(announcement => { %>
+                                            <div class="col-md-6 mb-4">
+                                                <div class="card h-100">
+                                                    <% if (announcement.image_path) { %>
+                                                        <img src="/uploads/<%= announcement.image_path %>" class="card-img-top" alt="Announcement Image">
+                                                    <% } %>
+                                                    <div class="card-body">
+                                                        <h5 class="card-title"><%= announcement.title %></h5>
+                                                        <p class="card-text"><%= announcement.content %></p>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <small class="text-muted">
+                                                                Posted by <%= announcement.username %> on <%= new Date(announcement.created_at).toLocaleDateString() %>
+                                                            </small>
+                                                            <% if (announcement.attachments && announcement.attachments.length > 0) { %>
+                                                                <div class="attachments">
+                                                                    <% announcement.attachments.forEach(attachment => { %>
+                                                                        <a href="/uploads/<%= attachment.filename %>" class="btn btn-sm btn-outline-primary" target="_blank">
+                                                                            <i class="fas fa-paperclip"></i> Open File
+                                                                        </a>
+                                                                    <% }); %>
+                                                                </div>
+                                                            <% } %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                <% } else { %>
+                                    <p class="text-muted">No recent announcements.</p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instagram Feed Column (30%) -->
+                    <div class="col-lg-4">
+                        <div class="card sticky-top" style="top: 1rem;">
+                            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="fab fa-instagram me-2"></i>IRCAD Africa Instagram Feed
+                                </h5>
+                                <a href="https://www.instagram.com/ircadafrica/" class="btn btn-light btn-sm" target="_blank">
+                                    View on Instagram <i class="fas fa-external-link-alt ms-1"></i>
+                                </a>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="instagram-feed-container" style="height: calc(100vh - 200px); overflow-y: auto;">
+                                    <blockquote 
+                                        class="instagram-media" 
+                                        data-instgrm-permalink="https://www.instagram.com/ircadafrica/"
+                                        data-instgrm-version="14"
+                                        style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:540px; min-width:326px; padding:0; width:99.375%;">
+                                    </blockquote>
+                                    <script async src="//www.instagram.com/embed.js"></script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Copy button functionality for mountable services
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const command = this.dataset.command;
+                const os = this.dataset.os;
+                
+                navigator.clipboard.writeText(command).then(() => {
+                    // Show feedback
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                });
+
+                // Show instructions based on OS
+                let instructions = '';
+                if (os === 'windows') {
+                    instructions = 'Press Windows + R, paste the command, and press Enter';
+                } else {
+                    instructions = 'Open Finder/File Manager and press Cmd/Ctrl + K, paste the command';
+                }
+                
+                // Show toast notification
+                const toast = document.createElement('div');
+                toast.className = 'toast position-fixed bottom-0 end-0 m-3';
+                toast.setAttribute('role', 'alert');
+                toast.setAttribute('aria-live', 'assertive');
+                toast.setAttribute('aria-atomic', 'true');
+                toast.innerHTML = `
+                    <div class="toast-header">
+                        <strong class="me-auto">Mounting Instructions</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${instructions}
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                const bsToast = new bootstrap.Toast(toast);
+                bsToast.show();
+                
+                // Remove toast after it's hidden
+                toast.addEventListener('hidden.bs.toast', function () {
+                    toast.remove();
+                });
+            });
+        });
+    });
+    </script>
 </body>
 </html> 

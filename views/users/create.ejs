@@ -29,6 +29,16 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="full_name">Full Name</label>
+                        <input type="text" id="full_name" name="full_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" required>
                     </div>
@@ -40,6 +50,38 @@
                             <option value="editor">Editor</option>
                             <option value="admin">Admin</option>
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <select id="department" name="department" required>
+                            <option value="Administration">Administration</option>
+                            <option value="Research and Development">Research and Development</option>
+                            <option value="Medical">Medical</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Parttime and Intern">Parttime and Intern</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job_title">Job Title</label>
+                        <input type="text" id="job_title" name="job_title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Office Phone</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mobile_phone">Mobile Phone</label>
+                        <input type="tel" id="mobile_phone" name="mobile_phone">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bio">Bio</label>
+                        <textarea id="bio" name="bio" rows="4"></textarea>
                     </div>
 
                     <button type="submit" class="btn-submit">

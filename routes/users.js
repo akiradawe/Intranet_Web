@@ -45,12 +45,32 @@ router.get('/new', (req, res) => {
 
 // Create new user
 router.post('/', async (req, res) => {
-    const { username, password, role } = req.body;
+    const { 
+        username, 
+        password, 
+        role, 
+        full_name,
+        email,
+        department,
+        job_title,
+        phone,
+        mobile_phone,
+        bio
+    } = req.body;
 
-    if (!username || !password || !role) {
+    if (!username || !password || !role || !full_name || !email || !department || !job_title) {
         return res.render('users/create', {
             user: req.session.user,
-            error: 'All fields are required'
+            error: 'Username, password, role, full name, email, department, and job title are required'
+        });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.render('users/create', {
+            user: req.session.user,
+            error: 'Please enter a valid email address'
         });
     }
 
@@ -59,8 +79,9 @@ router.post('/', async (req, res) => {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        db.query('INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
-            [username, hashedPassword, role],
+        db.query(
+            'INSERT INTO users (username, password, role, full_name, email, department, job_title, phone, mobile_phone, bio, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "active")',
+            [username, hashedPassword, role, full_name, email, department, job_title, phone || null, mobile_phone || null, bio || null],
             (error) => {
                 if (error) {
                     console.error(error);

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Announcement - IRCAD Africa Intranet</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <%- include('../partials/sidebar', { user: user, path: '/announcements' }) %>
+        
+        <main class="content">
+            <div class="content-header">
+                <h1>Edit Announcement</h1>
+                <a href="/announcements" class="btn-new">
+                    <i class="fas fa-arrow-left"></i> Back to Announcements
+                </a>
+            </div>
+
+            <% if (error) { %>
+                <div class="error-message"><%= error %></div>
+            <% } %>
+
+            <form action="/announcements/<%= announcement.id %>/edit" method="POST" enctype="multipart/form-data" class="form-container">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" value="<%= announcement.title %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="content">Content:</label>
+                    <textarea id="content" name="content" rows="5" required><%= announcement.content %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="image">Announcement Image:</label>
+                    <div class="image-upload-container">
+                        <% if (announcement.image_path) { %>
+                            <div class="current-image">
+                                <img src="/uploads/<%= announcement.image_path %>" alt="Current Image">
+                                <p>Current image</p>
+                            </div>
+                        <% } %>
+                        <input type="file" id="image" name="image" accept="image/*" class="image-input">
+                        <div class="image-preview" id="imagePreview">
+                            <i class="fas fa-image"></i>
+                            <span>Preview will appear here</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Current Attachments</label>
+                    <div class="list-group">
+                        <% if (announcement.attachments && announcement.attachments.length > 0) { %>
+                            <% announcement.attachments.forEach(function(attachment) { %>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-paperclip me-2"></i>
+                                        <%= attachment.filename %>
+                                    </div>
+                                    <div>
+                                        <a href="/uploads/<%= attachment.filename %>" class="btn btn-sm btn-outline-primary me-2" target="_blank">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        <form action="/announcements/<%= announcement.id %>/attachments/<%= attachment.id %>/delete" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this attachment?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="text-muted">No attachments</div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="attachments">Add New Attachments (optional):</label>
+                    <input type="file" id="attachments" name="attachments" multiple>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i> Update Announcement
+                </button>
+            </form>
+        </main>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('image');
+        const imagePreview = document.getElementById('imagePreview');
+
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+    </script>
+</body>
+</html> 

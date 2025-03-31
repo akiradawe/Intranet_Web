@@ -6,12 +6,24 @@
         <li><a href="/dashboard" class="<%= path === '/dashboard' ? 'active' : '' %>">
             <i class="fas fa-home"></i> Dashboard
         </a></li>
+        <li><a href="/my-account" class="<%= path === '/my-account' ? 'active' : '' %>">
+            <i class="fas fa-user"></i> My Account
+        </a></li>
         <li><a href="/announcements" class="<%= path === '/announcements' ? 'active' : '' %>">
             <i class="fas fa-bullhorn"></i> Announcements
         </a></li>
         <li><a href="/internal-links" class="<%= path === '/internal-links' ? 'active' : '' %>">
             <i class="fas fa-link"></i> Internal Links
         </a></li>
+        <li><a href="/team" class="<%= path === '/team' ? 'active' : '' %>">
+            <i class="fas fa-users"></i> Team
+        </a></li>
+        <li class="nav-item">
+            <a class="nav-link" href="/mountable-services">
+                <i class="fas fa-network-wired"></i>
+                <span>Mountable Services</span>
+            </a>
+        </li>
         <% if (user.role === 'admin') { %>
             <li><a href="/users" class="<%= path === '/users' ? 'active' : '' %>">
                 <i class="fas fa-users"></i> User Management
