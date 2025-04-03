@@ -1,170 +1,165 @@
 # IRCAD Africa Intranet
 
-A modern, secure, and feature-rich intranet platform for IRCAD Africa, designed to facilitate internal communication, document sharing, and resource management.
+A modern, secure, and user-friendly intranet system for IRCAD Africa, built with PHP and MySQL.
 
 ## Features
 
-### User Management
-- Secure user authentication and authorization
-- Role-based access control (Admin, Staff)
-- User profile management
-- Password security with bcrypt encryption
+- **User Authentication**
+  - Secure login system
+  - Role-based access control (Admin/User)
+  - Password hashing and security measures
+  - Session management
 
-### Announcements
-- Create and manage announcements
-- Rich text editor for content creation
-- File attachments support
-- Categorized announcements
-- Priority-based display
+- **Announcements**
+  - Create and manage announcements
+  - Rich text content support
+  - File attachments
+  - Featured images
+  - Carousel display on dashboard
 
-### Internal Links
-- Quick access to important resources
-- Customizable link categories
-- Icon support for visual organization
-- Admin-managed link collection
+- **Internal Links**
+  - Quick access to important resources
+  - Categorized organization
+  - Custom icons and colors
+  - External link support
 
-### Dashboard
-- Personalized user dashboard
-- Recent announcements display
-- Quick access to internal links
-- Responsive design for all devices
+- **Mountable Services**
+  - Network drive mounting instructions
+  - Platform-specific commands
+  - Copy-to-clipboard functionality
+  - Service descriptions
 
-## Tech Stack
+- **Team Directory**
+  - Team member profiles
+  - Department organization
+  - Contact information
+  - Profile pictures
+  - Quick access to team member details
 
-- **Backend**: Node.js with Express.js
-- **Frontend**: EJS templating engine
-- **Database**: MySQL
-- **Authentication**: Express-session
-- **File Upload**: Multer
-- **Rich Text Editor**: Quill
-- **Styling**: Custom CSS with modern design principles
+- **User Management**
+  - User profiles
+  - Role management
+  - Account settings
+  - Profile picture upload
+
+## Technology Stack
+
+- **Backend**
+  - PHP 7.4+
+  - MySQL 5.7+
+  - Apache/Nginx web server
+
+- **Frontend**
+  - HTML5
+  - CSS3
+  - JavaScript (ES6+)
+  - Bootstrap 5
+  - Font Awesome 6
+
+- **Security**
+  - Password hashing (PHP's password_hash)
+  - CSRF protection
+  - XSS prevention
+  - SQL injection prevention
+  - Secure session handling
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
-- MySQL Server
-- XAMPP (or similar local development environment)
+- PHP 7.4 or higher
+- MySQL 5.7 or higher
+- Apache/Nginx web server
+- mod_rewrite enabled (for Apache)
+- GD or Imagick PHP extension for image handling
+- File upload permissions
 
 ## Installation
 
 1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/intranet.ircad.africa.git
-cd intranet.ircad.africa
-```
+   ```bash
+   git clone https://github.com/yourusername/ircad-intranet.git
+   cd ircad-intranet
+   ```
 
-2. Install dependencies:
-```bash
-npm install
-```
+2. Install dependencies (if using Composer):
+   ```bash
+   composer install
+   ```
 
 3. Set up the database:
-- Create a MySQL database named `ircad_intranet`
-- Import the database schema from `database/ircad_intranet.sql`
+   - Create a new MySQL database
+   - Import the database schema from `/sql/intranet.sql`
+   - Configure database connection in `.env`
 
-4. Configure environment variables:
-- Create a `.env` file in the root directory
-- Add the following variables:
+4. Configure environment:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your database credentials and other settings
+   ```
+
+5. Set up required directories:
+   ```bash
+   mkdir -p public/uploads/{profile-pictures,announcements}
+   chmod -R 755 public/uploads
+   ```
+
+6. Configure your web server:
+   - Point document root to the project directory
+   - Enable mod_rewrite (Apache)
+   - Ensure proper permissions are set
+
+## Development
+
+1. Create a new branch for your feature:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. Make your changes and commit:
+   ```bash
+   git add .
+   git commit -m "Description of your changes"
+   ```
+
+3. Push to your branch:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+4. Create a Pull Request
+
+## Directory Structure
+
 ```
-DB_HOST=localhost
-DB_USER=your_username
-DB_PASSWORD=your_password
-DB_NAME=ircad_intranet
-SESSION_SECRET=your_session_secret
+intranet/
+├── announcements/     # Announcements management
+├── assets/           # Static assets (CSS, JS, images)
+├── auth/             # Authentication system
+├── config/           # Configuration files
+├── includes/         # Common PHP includes
+├── internal-links/   # Internal links management
+├── mountable-services/ # Network services management
+├── my-account/       # User account management
+├── public/           # Public assets and uploads
+├── sql/              # Database schema and migrations
+├── team/             # Team management
+├── users/            # User management
+├── utils/            # Utility functions
+├── .env.example      # Example environment configuration
+└── index.php         # Main entry point
 ```
 
-5. Start the application:
-```bash
-npm start
-```
+## Security Considerations
 
-The application will be available at `http://localhost:3000`
-
-## Project Structure
-
-```
-intranet.ircad.africa/
-├── config/
-│   └── database.js
-├── public/
-│   ├── css/
-│   ├── js/
-│   └── uploads/
-├── routes/
-│   ├── announcements.js
-│   ├── auth.js
-│   ├── internal-links.js
-│   └── users.js
-├── utils/
-│   └── fileUpload.js
-├── views/
-│   ├── announcements/
-│   ├── internal-links/
-│   ├── users/
-│   └── partials/
-├── app.js
-└── package.json
-```
-
-## Usage
-
-### Admin Features
-1. User Management
-   - Create new user accounts
-   - Edit user profiles
-   - Manage user roles
-   - Reset passwords
-
-2. Announcements
-   - Create new announcements
-   - Upload attachments
-   - Set announcement priority
-   - Manage existing announcements
-
-3. Internal Links
-   - Add new quick links
-   - Organize links by category
-   - Customize link icons
-   - Manage link visibility
-
-### Staff Features
-1. Dashboard
-   - View recent announcements
-   - Access quick links
-   - Update personal profile
-
-2. Announcements
-   - View all announcements
-   - Download attachments
-   - Filter by category
-
-## Security Features
-
-- Secure password hashing with bcrypt
-- Session-based authentication
-- Role-based access control
-- Input validation and sanitization
-- Secure file upload handling
-- XSS protection
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- Never commit sensitive information (API keys, passwords, etc.)
+- Keep `.env` file in `.gitignore`
+- Regularly update dependencies
+- Follow security best practices for file uploads
+- Implement proper access controls
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is proprietary and confidential. All rights reserved.
 
 ## Support
 
-For support, please contact the IT department at IRCAD Africa or create an issue in the repository.
-
-## Acknowledgments
-
-- IRCAD Africa for providing the opportunity to develop this intranet
-- All contributors who have helped shape this project
-- The open-source community for the tools and libraries used 
+For support, please contact the IT department at IRCAD Africa. # Intranet_Web
