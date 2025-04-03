@@ -76,7 +76,7 @@ A modern, secure, and user-friendly intranet system for IRCAD Africa, built with
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/ircad-intranet.git
+   git clone https://github.com/akiradawe/Intranet_Web.git
    cd ircad-intranet
    ```
 
